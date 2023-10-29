@@ -3,7 +3,17 @@
     "type": "object",
     "properties": {
         "start": {
-            "type": "string"
+            "anyOf": [
+                {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                {
+                    "type": "string"
+                }
+            ]
         },
         "preflight": {
             "anyOf": [

@@ -31,13 +31,18 @@ try {
     let redeployFile;
 
     if (!redeploy_path) {
-        fs.writeFileSync(
-            path.join(WORK_DIR, "REDEPLY"),
-            Date.now().toString(),
-            "utf-8"
-        );
+        const defaultRedeployPath = path.join(WORK_DIR, "REDEPLOY");
+        const checkExistingPath = fs.existsSync(defaultRedeployPath);
 
-        redeployFile = path.join(WORK_DIR, "REDEPLY");
+        if (!checkExistingPath) {
+            fs.writeFileSync(
+                defaultRedeployPath,
+                Date.now().toString(),
+                "utf-8"
+            );
+        }
+
+        redeployFile = path.join(WORK_DIR, "REDEPLOY");
     } else {
         redeployFile = path.resolve(WORK_DIR, redeploy_path);
     }
