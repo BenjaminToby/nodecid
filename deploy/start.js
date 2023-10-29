@@ -71,20 +71,13 @@ function startProcess({ command, preflight, redeploy_file, port, first_run }) {
                 console.log("******************************");
 
                 try {
-                    if (!preflight) {
-                        console.log(
-                            `${colors.FgRed}Error:${colors.Reset} No preflight included in config file. If you don't want to run any preflight command simply add an empty array.`
-                        );
-                        process.exit();
-                    }
-
                     const runPreflight = preflightFn(preflight);
 
                     if (!runPreflight) {
                         // TODO: Action to take if preflight fails
 
                         console.log(
-                            `${colors.FgRed}Error:${colors.Reset} No preflight included in config file. If you don't want to run any preflight command simply add an empty array.`
+                            `${colors.FgRed}Error:${colors.Reset} Preflight Failed.`
                         );
                     } else {
                         killChild(port).then((kill) => {
@@ -225,45 +218,6 @@ async function killChild(port) {
         }
 
         childProcess = null;
-
-        // await new Promise((resolve) => {
-        //     setTimeout(() => {
-        //         resolve(true);
-        //     }, 1000);
-        // });
-
-        // console.log("Child Process Killed?", childProcess.killed);
-
-        // if (childProcess.killed) {
-        //     return true;
-        // } else {
-        //     console.log(
-        //         `${colors.FgYellow}WARNING:${colors.Reset} Child Process Not Killed`
-        //     );
-
-        //     console.log(childProcess);
-
-        //     let killRetries = 0;
-
-        //     while (!childProcess.killed) {
-        //         console.log("Trying to Kill child =>", killRetries);
-        //         killRetries++;
-
-        //         childProcess.kill(KILL_SIGNAL);
-
-        //         if (childProcess.killed) {
-        //             return true;
-        //             break;
-        //         }
-
-        //         if (killRetries > 20) {
-        //             console.log(
-        //                 `${colors.FgRed}Error:${colors.Reset} Child Process couldn't be killed!`
-        //             );
-        //             process.exit();
-        //         }
-        //     }
-        // }
 
         return true;
     } catch (error) {
