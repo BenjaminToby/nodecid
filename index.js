@@ -25,7 +25,7 @@ try {
     /** @type {NodeCIConfig} */
     const config = JSON.parse(configText);
 
-    const { start, preflight, redeploy_path } = config;
+    const { start, preflight, redeploy_path, first_run } = config;
 
     /** @type {string | undefined} */
     let redeployFile;
@@ -53,6 +53,7 @@ try {
         command: start,
         preflight,
         redeploy_file: redeployFile,
+        first_run,
     });
 } catch (error) {
     console.log(

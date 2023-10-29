@@ -1,6 +1,6 @@
 {
     "name": "nodecid",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Simple CI/CD process",
     "main": "index.js",
     "bin": {

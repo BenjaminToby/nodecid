@@ -31,12 +31,14 @@ let childProcess = null;
  * @param {string[] | string} param0.preflight
  * @param {string} param0.redeploy_file
  * @param {string | number} [param0.port]
+ * @param {boolean} [param0.first_run] - Whether to run the preflight on first run. Default `false`
  */
-function startProcess({ command, preflight, redeploy_file, port }) {
+function startProcess({ command, preflight, redeploy_file, port, first_run }) {
     try {
-        console.log("First Run ...");
-
-        const runPreflight = preflightFn(preflight);
+        if (first_run) {
+            console.log("First Run ...");
+            const runPreflight = preflightFn(preflight);
+        }
 
         if (!preflight) {
             console.log(
@@ -164,7 +166,7 @@ function preflightFn(preflight) {
         } else if (typeof preflight == "object" && preflight?.[0]) {
             preflight.forEach((cmd, index) => {
                 try {
-                    execSync(cmd, options);
+                    const execCmd = execSync(cmd, options);
                 } catch (error) {
                     console.log(
                         `${colors.FgRed}Error:${colors.Reset} Preflight command ${cmd} Failed! => ${error.message}`

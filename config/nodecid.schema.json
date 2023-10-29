@@ -30,6 +30,9 @@
         },
         "redeploy_path": {
             "type": "string"
+        },
+        "first_run": {
+            "type": "boolean"
         }
     },
     "required": ["start", "preflight"]
