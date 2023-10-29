@@ -1,0 +1,17 @@
+{
+    "name": "nodecid",
+    "version": "1.0.0",
+    "description": "Simple CI/CD process",
+    "main": "index.js",
+    "bin": {
+        "nodecid": "./index.js",
+        "node-ci-cd": "./index.js"
+    },
+    "keywords": [
+        "CI/CD",
+        "Continuous Integration",
+        "Continous Deployment"
+    ],
+    "author": "Benjamin Toby",
+    "license": "MIT"
+}

@@ -1,0 +1,3 @@
+function githubWebhook() {
+    return true;
+}
