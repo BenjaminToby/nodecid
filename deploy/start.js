@@ -71,12 +71,6 @@ function startProcess({ command, preflight, redeploy_file, port, first_run }) {
                 console.log("******************************");
 
                 try {
-                    const runPreflight = preflightFn(preflight);
-
-                    if (!runPreflight) {
-                        // TODO: Action to take if preflight fails
-                    }
-
                     if (!preflight) {
                         console.log(
                             `${colors.FgRed}Error:${colors.Reset} No preflight included in config file. If you don't want to run any preflight command simply add an empty array.`
@@ -84,13 +78,23 @@ function startProcess({ command, preflight, redeploy_file, port, first_run }) {
                         process.exit();
                     }
 
-                    killChild(port).then((kill) => {
-                        if (kill) {
-                            childProcess = run(command);
-                        } else {
-                            process.exit();
-                        }
-                    });
+                    const runPreflight = preflightFn(preflight);
+
+                    if (!runPreflight) {
+                        // TODO: Action to take if preflight fails
+
+                        console.log(
+                            `${colors.FgRed}Error:${colors.Reset} No preflight included in config file. If you don't want to run any preflight command simply add an empty array.`
+                        );
+                    } else {
+                        killChild(port).then((kill) => {
+                            if (kill) {
+                                childProcess = run(command);
+                            } else {
+                                process.exit();
+                            }
+                        });
+                    }
                 } catch (/** @type {*} */ error) {
                     console.log(
                         `${colors.FgRed}Error:${colors.Reset} killing child processes => ${error.message}`
