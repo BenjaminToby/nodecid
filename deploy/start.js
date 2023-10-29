@@ -162,7 +162,16 @@ function preflightFn(preflight) {
         if (typeof preflight == "string") {
             execFileSync(preflight, options);
         } else if (typeof preflight == "object" && preflight?.[0]) {
-            preflight.forEach((cmd) => execSync(cmd, options));
+            preflight.forEach((cmd, index) => {
+                try {
+                    execSync(cmd, options);
+                } catch (error) {
+                    console.log(
+                        `${colors.FgRed}Error:${colors.Reset} Preflight command ${cmd} Failed! => ${error.message}`
+                    );
+                    process.exit();
+                }
+            });
         }
         return true;
     } catch (error) {
