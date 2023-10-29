@@ -73,6 +73,10 @@ function startProcess({ command, preflight, redeploy_file, port, first_run }) {
                 try {
                     const runPreflight = preflightFn(preflight);
 
+                    if (!runPreflight) {
+                        // TODO: Action to take if preflight fails
+                    }
+
                     if (!preflight) {
                         console.log(
                             `${colors.FgRed}Error:${colors.Reset} No preflight included in config file. If you don't want to run any preflight command simply add an empty array.`
@@ -164,16 +168,18 @@ function preflightFn(preflight) {
         if (typeof preflight == "string") {
             execFileSync(preflight, options);
         } else if (typeof preflight == "object" && preflight?.[0]) {
-            preflight.forEach((cmd, index) => {
+            for (let i = 0; i < preflight.length; i++) {
+                const cmd = preflight[i];
                 try {
                     const execCmd = execSync(cmd, options);
                 } catch (error) {
                     console.log(
                         `${colors.FgRed}Error:${colors.Reset} Preflight command ${cmd} Failed! => ${error.message}`
                     );
-                    process.exit();
+                    return false;
+                    break;
                 }
-            });
+            }
         }
         return true;
     } catch (error) {
