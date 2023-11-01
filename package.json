@@ -1,6 +1,6 @@
 {
     "name": "nodecid",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Simple CI/CD process",
     "main": "index.js",
     "bin": {
@@ -13,5 +13,8 @@
         "Continous Deployment"
     ],
     "author": "Benjamin Toby",
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "kill-port": "^2.0.1"
+    }
 }

@@ -11,6 +11,7 @@ const {
     ChildProcess,
 } = require("child_process");
 const colors = require("../utils/console-colors");
+const kill = require("kill-port");
 
 ////////////////////////////////////////////
 ////////////////////////////////////////////
@@ -20,9 +21,13 @@ let redeployments = 0;
 
 /** @type {NodeJS.Signals | number} */
 const KILL_SIGNAL = "SIGTERM";
+// const KILL_SIGNAL = "SIGINT";
 
 /** @type {ChildProcess | null} */
 let childProcess = null;
+
+const pTitle = "nodecid";
+process.title = pTitle;
 
 /**
  * # Start the process
@@ -30,7 +35,7 @@ let childProcess = null;
  * @param {string} param0.command
  * @param {string[] | string} param0.preflight
  * @param {string} param0.redeploy_file
- * @param {string | number} [param0.port]
+ * @param {string | number} [param0.port] - The port to kill on rebuild
  * @param {boolean} [param0.first_run] - Whether to run the preflight on first run. Default `false`
  */
 function startProcess({ command, preflight, redeploy_file, port, first_run }) {
@@ -130,7 +135,12 @@ function run(command) {
 
         let childProcess = spawn(firstCommand, startCommandArray, {
             stdio: "inherit",
+            killSignal: KILL_SIGNAL,
         });
+
+        // let childProcess = execSync(command, {
+        //     stdio: "inherit",
+        // });
 
         redeployments++;
 
@@ -192,7 +202,7 @@ function preflightFn(preflight) {
 ////////////////////////////////////////////
 
 /**
- * ## Preflight Function
+ * ## Kill Child Process Function
  * @param {string | number} [port]
  * @returns {Promise<boolean>}
  */
@@ -200,24 +210,12 @@ async function killChild(port) {
     if (!childProcess) return false;
 
     try {
-        childProcess.kill(KILL_SIGNAL);
         const childProcessPID = childProcess.pid;
-        try {
-            if (childProcessPID) {
-                if (process.platform.match(/linux/i)) {
-                    execSync(`kill -9 ${childProcessPID}`);
-                }
-                if (process.platform.match(/win/i)) {
-                    execSync(`taskkill /F /PID ${childProcessPID}`);
-                }
-            }
-        } catch (error) {
-            console.log(
-                `${colors.FgYellow}WARNING:${colors.Reset} Process ${childProcessPID} couldn't be killed => ${error.message}`
-            );
-        }
+        childProcess.kill();
 
-        childProcess = null;
+        if (port) {
+            await kill(Number(port));
+        }
 
         return true;
     } catch (error) {

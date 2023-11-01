@@ -16,47 +16,64 @@ const WORK_DIR = process.cwd();
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 
-try {
-    const configText = fs.readFileSync(
-        path.join(WORK_DIR, "nodecid.config.json"),
-        "utf-8"
-    );
+function run() {
+    try {
+        const configText = fs.readFileSync(
+            path.join(WORK_DIR, "nodecid.config.json"),
+            "utf-8"
+        );
 
-    /** @type {NodeCIConfig} */
-    const config = JSON.parse(configText);
+        /** @type {NodeCIConfig} */
+        const config = JSON.parse(configText);
 
-    const { start, preflight, redeploy_path, first_run } = config;
+        const { start, preflight, redeploy_path, first_run, port } = config;
 
-    /** @type {string | undefined} */
-    let redeployFile;
+        /** @type {string | undefined} */
+        let redeployFile;
 
-    if (!redeploy_path) {
-        const defaultRedeployPath = path.join(WORK_DIR, "REDEPLOY");
-        const checkExistingPath = fs.existsSync(defaultRedeployPath);
+        if (!redeploy_path) {
+            const defaultRedeployPath = path.join(WORK_DIR, "REDEPLOY");
+            const checkExistingPath = fs.existsSync(defaultRedeployPath);
 
-        if (!checkExistingPath) {
-            fs.writeFileSync(
-                defaultRedeployPath,
-                Date.now().toString(),
-                "utf-8"
-            );
+            if (!checkExistingPath) {
+                fs.writeFileSync(
+                    defaultRedeployPath,
+                    Date.now().toString(),
+                    "utf-8"
+                );
+            }
+
+            redeployFile = path.join(WORK_DIR, "REDEPLOY");
+        } else {
+            redeployFile = path.resolve(WORK_DIR, redeploy_path);
         }
 
-        redeployFile = path.join(WORK_DIR, "REDEPLOY");
-    } else {
-        redeployFile = path.resolve(WORK_DIR, redeploy_path);
+        if (!redeployFile) throw new Error("Redeploy file not found!");
+
+        startProcess({
+            command: start,
+            preflight,
+            redeploy_file: redeployFile,
+            first_run,
+            port,
+        });
+    } catch (error) {
+        console.log(
+            `${colors.FgRed}ERROR:${colors.Reset} CI process failed! => ${error.message}`
+        );
     }
-
-    if (!redeployFile) throw new Error("Redeploy file not found!");
-
-    startProcess({
-        command: start,
-        preflight,
-        redeploy_file: redeployFile,
-        first_run,
-    });
-} catch (error) {
-    console.log(
-        `${colors.FgRed}ERROR:${colors.Reset} CI process failed! => ${error.message}`
-    );
 }
+
+run();
+
+////////////////////////////////////////////
+////////////////////////////////////////////
+////////////////////////////////////////////
+
+process.on("exit", () => {
+    console.log("Process exiting ...");
+});
+
+process.on("beforeExit", () => {
+    console.log("Process Before exit ...");
+});

@@ -1,5 +1,10 @@
 # Simple CI/CD package for any application
 
+[![package version](https://img.shields.io/npm/v/nodecid.svg?style=flat-square)](https://npmjs.org/package/nodecid)
+[![package downloads](https://img.shields.io/npm/dm/nodecid.svg?style=flat-square)](https://npmjs.org/package/nodecid)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![package license](https://img.shields.io/npm/l/nodecid.svg?style=flat-square)](https://npmjs.org/package/nodecid)
+
 Integrate a simple CI/CD process into your application without the hassle.
 
 _**NOTE:** This package needs `node` installed to work_
@@ -89,6 +94,14 @@ _NOTE:_ This also works for other languages, example:
 ```
 
 This app just runs whatever command you send it in an isolated child process, the command will be run as if being run in a terminal.
+
+#### All Available options in `nodecid.config.json` file
+
+-   **`start`**: _string_: The start Command
+-   **`preflight`**: _string | Array_: Array of commands or shell script file to run before reloading application
+-   **`redeploy_path`**: _string_: _Optional_: The path to trigger a redeployment. Default `./REDEPLOY`
+-   **`port`**: _string | number_: _Optional_: A port to kill if running a server. _NOTE_: it is important to provide this option if running a server else the process may not terminate properly
+-   **`first_run`**: _boolean_: _Optional_: If the preflight should run on first run. Default `false`.
 
 ### Redeployment
 
