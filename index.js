@@ -26,7 +26,15 @@ function run() {
         /** @type {NodeCIConfig} */
         const config = JSON.parse(configText);
 
-        const { start, preflight, redeploy_path, first_run, port } = config;
+        const {
+            start,
+            preflight,
+            postflight,
+            build,
+            redeploy_path,
+            first_run,
+            port,
+        } = config;
 
         /** @type {string | undefined} */
         let redeployFile;
@@ -56,6 +64,7 @@ function run() {
             redeploy_file: redeployFile,
             first_run,
             port,
+            postflight,
         });
     } catch (error) {
         console.log(

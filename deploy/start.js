@@ -34,11 +34,19 @@ process.title = pTitle;
  * @param {object} param0
  * @param {string} param0.command
  * @param {string[] | string} param0.preflight
+ * @param {string[] | string} [param0.postflight]
  * @param {string} param0.redeploy_file
- * @param {string | number} [param0.port] - The port to kill on rebuild
+ * @param {string | number | (string | number)[]} [param0.port] - The port to kill on rebuild
  * @param {boolean} [param0.first_run] - Whether to run the preflight on first run. Default `false`
  */
-function startProcess({ command, preflight, redeploy_file, port, first_run }) {
+function startProcess({
+    command,
+    preflight,
+    postflight,
+    redeploy_file,
+    port,
+    first_run,
+}) {
     try {
         if (first_run) {
             console.log("First Run ...");
@@ -88,6 +96,21 @@ function startProcess({ command, preflight, redeploy_file, port, first_run }) {
                         killChild(port).then((kill) => {
                             if (kill) {
                                 childProcess = run(command);
+
+                                if (postflight) {
+                                    const runPostflight = preflightFn(
+                                        postflight,
+                                        true
+                                    );
+
+                                    if (!runPostflight) {
+                                        // TODO: Action to take if postflight fails
+
+                                        console.log(
+                                            `${colors.FgRed}Error:${colors.Reset} Postflight Failed.`
+                                        );
+                                    }
+                                }
                             } else {
                                 process.exit();
                             }
@@ -160,10 +183,12 @@ function run(command) {
 /**
  * ## Preflight Function
  * @param {string[] | string} preflight
+ * @param {boolean} [postflight]
  * @returns {boolean}
  */
-function preflightFn(preflight) {
-    console.log("Preflight Running ...");
+function preflightFn(preflight, postflight) {
+    const tag = postflight ? "Postflight" : "Preflight";
+    console.log(`${tag} Running ...`);
 
     /** @type {import("child_process").ExecSyncOptions} */
     const options = {
@@ -181,7 +206,7 @@ function preflightFn(preflight) {
                     const execCmd = execSync(cmd, options);
                 } catch (error) {
                     console.log(
-                        `${colors.FgRed}Error:${colors.Reset} Preflight command ${cmd} Failed! => ${error.message}`
+                        `${colors.FgRed}Error:${colors.Reset} ${tag} command ${cmd} Failed! => ${error.message}`
                     );
                     return false;
                     break;
@@ -191,7 +216,7 @@ function preflightFn(preflight) {
         return true;
     } catch (error) {
         console.log(
-            `${colors.FgRed}Error:${colors.Reset} Preflight Failed! => ${error.message}`
+            `${colors.FgRed}Error:${colors.Reset} ${tag} Failed! => ${error.message}`
         );
         return false;
     }
@@ -203,7 +228,7 @@ function preflightFn(preflight) {
 
 /**
  * ## Kill Child Process Function
- * @param {string | number} [port]
+ * @param {string | number | (string | number)[]} [port]
  * @returns {Promise<boolean>}
  */
 async function killChild(port) {
@@ -213,7 +238,12 @@ async function killChild(port) {
         const childProcessPID = childProcess.pid;
         childProcess.kill();
 
-        if (port) {
+        if (typeof port == "object" && port?.[0]) {
+            for (let i = 0; i < port.length; i++) {
+                const singlePort = port[i];
+                await kill(Number(singlePort));
+            }
+        } else if (port) {
             await kill(Number(port));
         }
 

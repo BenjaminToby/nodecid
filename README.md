@@ -99,8 +99,9 @@ This app just runs whatever command you send it in an isolated child process, th
 
 -   **`start`**: _string_: The start Command
 -   **`preflight`**: _string | Array_: Array of commands or shell script file to run before reloading application
+-   **`postflight`**: _string | Array_: _Optional_: Array of commands or shell script file to run after reloading application
 -   **`redeploy_path`**: _string_: _Optional_: The path to trigger a redeployment. Default `./REDEPLOY`
--   **`port`**: _string | number_: _Optional_: A port to kill if running a server. _NOTE_: it is important to provide this option if running a server else the process may not terminate properly
+-   **`port`**: _string | number | (string | number)[]_: _Optional_: A port(or array of ports) to kill if running a server. _NOTE_: it is important to provide this option if running a server else the process may not terminate properly
 -   **`first_run`**: _boolean_: _Optional_: If the preflight should run on first run. Default `false`.
 
 ### Redeployment
